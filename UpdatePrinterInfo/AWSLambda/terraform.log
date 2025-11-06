@@ -1,0 +1,13 @@
+2025-11-04T16:51:55.317-0800 [INFO]  Terraform version: 1.13.3
+2025-11-04T16:51:55.319-0800 [DEBUG] using github.com/hashicorp/go-tfe v1.74.1
+2025-11-04T16:51:55.319-0800 [DEBUG] using github.com/hashicorp/hcl/v2 v2.24.0
+2025-11-04T16:51:55.319-0800 [DEBUG] using github.com/hashicorp/terraform-svchost v0.1.1
+2025-11-04T16:51:55.319-0800 [DEBUG] using github.com/zclconf/go-cty v1.16.3
+2025-11-04T16:51:55.319-0800 [INFO]  Go runtime version: go1.24.5
+2025-11-04T16:51:55.319-0800 [INFO]  CLI args: []string{"C:\\Terraform\\terraform.exe", "init"}
+2025-11-04T16:51:55.331-0800 [DEBUG] Attempting to open CLI config file: C:\Users\Bryan\AppData\Roaming\terraform.rc
+2025-11-04T16:51:55.331-0800 [DEBUG] File doesn't exist, but doesn't need to. Ignoring.
+2025-11-04T16:51:55.331-0800 [DEBUG] ignoring non-existing provider search directory terraform.d/plugins
+2025-11-04T16:51:55.331-0800 [DEBUG] ignoring non-existing provider search directory C:\Users\Bryan\AppData\Roaming\terraform.d\plugins
+2025-11-04T16:51:55.334-0800 [DEBUG] ignoring non-existing provider search directory C:\Users\Bryan\AppData\Roaming\HashiCorp\Terraform\plugins
+2025-11-04T16:51:55.335-0800 [INFO]  CLI command args: []string{"init"}

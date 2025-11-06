@@ -1,0 +1,10 @@
+2025-11-02 21:54:38.358235 INFO AppDaemon: Starting apps: ['printer_api']
+2025-11-02 21:54:38.370705 INFO AppDaemon: Calling initialize() for printer_api
+2025-11-02 21:54:38.375939 INFO printer_api: PrinterMonitor service is initializing.
+2025-11-02 21:54:38.379780 INFO printer_api: Printer scan scheduled to run once a day.
+2025-11-02 21:54:38.393022 INFO printer_api: Scheduled printer scan initiated.
+2025-11-02 21:54:38.394448 INFO printer_api: Starting network scan for printers in subnet 192.168.1.0/24.
+2025-11-02 21:54:38.436211 INFO printer_api: Found open printer port on 192.168.1.11. Getting details.
+2025-11-02 21:54:38.859277 INFO printer_api: Successfully collected data for: Brother MFC-J6535DW at 192.168.1.11.
+2025-11-02 21:54:43.447805 INFO printer_api: Scan complete. Found 1 printer(s): [{'ip_address': '192.168.1.11', 'make': 'Brother', 'model': 'MFC-J6535DW', 'description': 'Brother NC-390w, Firmware Ver.ZC  ,MID 8CH-121-001', 'cartridges': [{'name': 'Black Ink Cartridge', 'level': '20%', 'color': 'black'}, {'name': 'Cyan Ink Cartridge', 'level': 'N/A', 'color': 'cyan'}, {'name': 'Magenta Ink Cartridge', 'level': '12%', 'color': 'magenta'}, {'name': 'Yellow Ink Cartridge', 'level': 'N/A', 'color': 'yellow'}]}]
+2025-11-02 21:54:43.466438 INFO printer_api: Network scan complete.

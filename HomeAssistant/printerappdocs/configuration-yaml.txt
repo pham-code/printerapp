@@ -1,0 +1,12 @@
+system_packages:
+  - net-snmp-dev
+  - net-snmp
+  - python3-dev
+  - build-base
+  - net-snmp-tools
+  - scapy
+python_packages:
+  - pysnmp==7.1.22
+  - pyasn1==0.6.1
+init_commands: []
+log_level: info

@@ -1,0 +1,123 @@
+Overview:
+
+what do I send to Gemini 2.5 Flash Preview to generate code for my new application with the following requirements:
+- Create a new AWS Lambda service written in Java technologies, especially Spring Boot.
+  - This service is a POST and will accept a JSON string.
+  - It will parse the string and obtain the printer ink level for each ink cartridges on my printer.
+  - When the ink level is under 15% remaining, it will trigger an SNS call and send an email to the customer regarding the status.
+  - Save the information of the printer and service execution time to MySQL database.
+- Create a new terraform script for managing infrastructure resources and provide a framework for having a new AWS Lambda to be deployed.
+  - Make sure the Lambda function has the correct role and able to integrate with the new API above
+- Create a new terraform script for deploying a resource for SNS so the program can use to send messages to the customer
+- Create a new database and a new table in MySQL to hold the POST service information and time execution plus the status after the call.
+
+
+As a senior microservice developer specialized in Java technologies, I want to create an AWS Lambda service that can perform the below:
+**1. AWS Lambda Service (Java Spring Boot)**
+
+*   **Service Type:** POST endpoint.
+*   **Header:** Accepts an encrypted key with user's information and client id for validating the request if it's from a valid source.
+*   **Input:** Accepts a JSON string containing printer ink level information.
+*   **Functionality:**
+    *   Parse the input JSON to extract ink levels for each cartridge.
+    *   If any ink cartridge level is below 15%, trigger an AWS SNS notification.
+    *   The SNS notification should send an email to the customer with the printer ink status.
+	*   The email address is customizable and should be setup to send to "test@test.com", for now.
+    *   Save the printer information (e.g., printer ID, cartridge details, ink levels) and the service execution timestamp to a MySQL database.
+*   **Technologies:** Java, Spring Boot.
+
+**2. Terraform Script for AWS Lambda Deployment**
+
+*   **Resource Management:** Create an AWS Lambda function.
+*   **Integration:**
+    *   Configure the Lambda function with the necessary IAM role.
+    *   Ensure the IAM role has permissions to:
+        *   Invoke the Lambda function.
+        *   Publish messages to AWS SNS.
+        *   Connect to and interact with a MySQL database.
+    *   Provide a framework to deploy the Java Spring Boot Lambda service created above.
+
+**3. Terraform Script for AWS SNS Topic Deployment**
+
+*   **Resource Management:** Create an AWS SNS topic.
+*   **Configuration:**
+    *   Configure the SNS topic to allow the Lambda function to publish messages to it.
+    *   Define an email subscription for the customer to receive notifications.
+
+**4. MySQL Database and Table Creation Script**
+
+*   **Database:** Create a new MySQL database (e.g., `printer_ink_db`).
+*   **Table:** Create a new table (e.g., `printer_status_logs`) within the `printer_ink_db` database.
+*   **Table Schema:** The table should include columns to store:
+    *   `log_id` (Primary Key, Auto-increment)
+    *   `user_id` (BIGINT)
+    *   `printer_ip` (VARCHAR)
+    *   `cartridge_id` (VARCHAR)
+    *   `ink_level_percentage` (INT)
+    *   `status_message` (TEXT, e.g., "Ink low, email sent", "Ink level OK")
+    *   `execution_timestamp` (DATETIME)
+    *   `email_sent` (BOOLEAN)
+*   **Example JSON Input for Lambda:**
+    ```json
+	{
+		"ip_address": "192.168.1.11",
+		"make": "Brother",
+		"model": "MFC-J6535DW",
+		"description": "Brother NC-390w, Firmware Ver.ZC  ,MID 8CH-121-001",
+		"cartridges": [
+			{
+				"name": "Black Ink Cartridge",
+				"level": "20%",
+				"color": "black"
+			},
+			{
+				"name": "Cyan Ink Cartridge",
+				"level": "N/A",
+				"color": "cyan"
+			},
+			{
+				"name": "Magenta Ink Cartridge",
+				"level": "12%",
+				"color": "magenta"
+			},
+			{
+				"name": "Yellow Ink Cartridge",
+				"level": "N/A",
+				"color": "yellow"
+			}
+		]
+	
+	```
+
+
+Parse the cartridges information and obtain the "name" of the first element with level under 15%.
+Look for product price using Gemini agent:
+	- find the best price for genuine <cartridges[].name> for printer input <model> and give me the price, store name, latest working clickable link to the product page, phone number. provide json format response similar to the below:
+
+		{
+		  "product_details": {
+			"cartridge_model": "Brother LC3029BK (Super/Extra High Yield)",
+			"printer_model": "Brother MFC-J6535DW",
+			"type": "Genuine/Original"
+		  },
+		  "best_price_offer": {
+			"price": "$26.31",
+			"store_name": "Amazon.com",
+			"product_link": "https://www.amazon.com/Brother-Cartridge-LC3029BK-Replacement-Replenishment/dp/B01LN3DB80",
+			"phone_number": "N/A (Online retailer; support handled via website)"
+		  },
+		  "alternative_offer": {
+			"price": "$27.69",
+			"store_name": "Staples",
+			"product_link": "https://www.staples.com/brother-lc30293bks-black-extra-high-yield-ink-cartridge/product_2429322",
+			"phone_number": "1-800-GO-DEPOT (Office Depot/Staples general customer service line)"
+		  }
+		}
+
+	- Once response is returned, create an email with the above details and leverage SNS to send user's notification regarding to the printer's ink level and what are the options to buy new cartridges:
+		Printer details: <shows printer model from product_details and cartridge information from the input>
+		Best Price: <price from best_price_offer>
+		
+Instruction to wrapup the code when it's all done and tested:
+
+- As of now, the functionality is at a stable state. Do not make major changes to the code. Make sure all variables are named as it is intended and easy to understand. Remove any unused code or duplicate functions with other names. Regenerate documentation and add/remove any logging as they should be there for a purpose without performance impact. Update copilot-instructions to reflect current coding logic and also apply coding standards with best practice as much as possible. Review and regenerate any missing logic to comments, documentation, or readme files and make sure all generated description is up to date and aligned with the code.

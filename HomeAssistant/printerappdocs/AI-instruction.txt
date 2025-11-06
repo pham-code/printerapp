@@ -1,0 +1,61 @@
+
+Original Instruction:
+
+as a senior developer specialized in home assistant application, I want to create an executable service and have it executed in homeassistant application as a service. The method should be written in Python version 3.12.11. This program will perform the following:
+- Key components should be presented with neat comments and easy to understand variable/function names.
+- Add info log to any except block which code could fail and make sure there are enough information to report the issue from logs.
+- create printer_api.py file in apps folder. All implementation should be in this file.
+- Do not hardcode any detail regarding to a specific printer. 
+- The discovery of the printer and any cartridge within should all be dynamic and based solely on what is known printer devices as of now on market.
+- Any connection to device on network should be quick and timeout should not exceed 2 seconds per socket connection.
+- This is an automation job and will be configured to only executes once every 5 min. Make update my appdaemon and apps yaml files accordingly.
+- It should start with checking if the current network has any printer connected.
+- For each printer found, collect the printer name, make, model and read ink level on each cartridge. Log them and also return as a response.
+- Create a log file and collect the printer model, cartridge name, ink part number, color, and ink level.
+- Add logging to the log file and update the log to collect any new data each step of the way.
+- Make sure there is no error or missing any third party updates.
+
+
+After the application is done and working:
+
+As a senior developer specialized in home assistant application, I want to create an executable service and have it executed in homeassistant application as a service. The application must be done in python version 3.12 on Alpine Linux OS.
+	Overview:
+    - An AppDaemon application PrinterScanner that discovers network printers and monitors their ink levels using the Simple Network Management Protocol (SNMP).
+    - The app scans the local network for devices with an open printer port (9100), queries them for identity and ink information, and publishes the findings to a Home Assistant sensor (`sensor.network_printers`).
+
+    Features:
+    - Daily automatic network scans.
+    - On-demand scanning via a Home Assistant service call.
+    - Concurrent scanning for efficiency, without blocking AppDaemon's main thread.
+    - A lock to prevent multiple scans from running simultaneously.
+    - Specific support for parsing ink levels from Brother printers.
+	
+	Main purpose:
+	- Scans the local network for printers and updates their status in Home Assistant.
+	- Uses a thread pool to concurrently check for open printer ports (9100) across the 192.168.1.x subnet. For each discovered printer, it fetches detailed information and ink levels.
+	- Retrieves the make and model of a printer using SNMP.
+	- Retrieves ink cartridge levels for Brother printers by using a hybrid strategy.
+        1. It first tries OIDs that return a direct integer value.
+        2. If that fails, it falls back to OIDs that return a complex hexadecimal string, which is then parsed.
+        Args:
+            ip_address (str): The IP address of the printer.
+            printer_info (dict): A dictionary of printer details, including the make.
+
+        Returns:
+            list: A list of dictionaries, each representing an ink cartridge.
+	- For printers other than Brothers, perform normal detection for obtaining ink levels.
+	
+	Implementation:
+	- Key components should be presented with neat comments and easy to understand variable/function names.
+	- Add info log to any except block which code could fail and make sure there are enough information to report the issue from logs.
+	- In apps folder, create printer_scanner.py file to have the main code and printer_const.py to hold only constants. All implementation should be in printer_scanner.py.
+	- Do not hardcode any detail regarding to a specific printer. All constants must be in printer_const.py. 
+	- The discovery of the printer and any cartridge within should all be dynamic and based solely on what is known printer devices as of now on market.
+	- Any connection to device on network should be quick and timeout should not exceed 1 seconds per socket connection.
+	- This is an automation job and will be configured to only executes once every 24 hours. Make update my appdaemon and apps yaml files accordingly.
+	- It should start with checking if the current network has any printer connected.
+	- For each printer found, collect the printer name, make, model and read ink level on each cartridge. Log them and also return as a response.
+	- Create a log file and collect the printer model, cartridge name, ink part number, color, and ink level.
+	- Add logging to the log file and update the log to collect any new data each step of the way.
+	- Make sure there is no error or missing any third party updates.
+	- Make sure the code is clearly documented and easy to understand. 

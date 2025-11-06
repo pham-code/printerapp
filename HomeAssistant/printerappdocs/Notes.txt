@@ -1,0 +1,70 @@
+Installation:
+https://www.home-assistant.io/installation/windows/
+
+activate Python env:
+source /config/venv/bin/activate
+Equivilant to In Toolkit VM:
+& C:/Bryan/ha-printer/.venv/Scripts/Activate.ps1
+
+pip install -r requirements.txt
+
+Run tests:
+python3 -m python_scripts.printer_api
+Equivilant to In Toolkit VM:
+python -m python_scripts.printer_api
+
+SSH to home assistant:
+ssh -m hmac-sha2-512 bryan@192.168.1.226
+Note: Set compatibility_mode and set it to true in "Advanced SSH and Web Terminal" add-on in Home Assistant
+
+add system package:
+apk add acl
+
+add permission for bryan to a folder:
+setfacl -m u:bryan:rwx /addon_configs
+
+# Add the CUPS server packages
+apk add cups cups-filters
+
+fix issue: Failed to set up socket for dynamic port forward to remote port 
+/etc/ssh/sshd_config.
+Ensure that the line AllowTcpForwarding yes
+service sshd restart
+
+set owner:
+chown [OPTIONS] OWNER[:GROUP] FILE...
+chown -R bryan:wheeler .
+
+# Add the pycups Python module. The package name is py3-pycups for Python 3.
+apk add py3-pycups
+
+appdaemon:
+  latitude: 34.05
+  longitude: -118.24
+  elevation: 2
+  time_zone: America/Los_Angeles
+  plugins:
+    HASS:
+      type: hass
+      token: !env_var SUPERVISOR_TOKEN
+http:
+  url: http://0.0.0.0:5050
+admin:
+api:
+hadashboard:
+
+system_packages:
+  - net-snmp-dev
+  - python3-dev
+  - build-base
+python_packages:
+  - pysnmp
+init_commands: []
+log_level: info
+
+call service
+action: print_status.get_cartridge_levels
+target: {}
+data: {
+  printer_id = "192.168.1.11"
+}

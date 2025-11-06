@@ -1,0 +1,9 @@
+---
+hello_world:
+  module: hello
+  class: HelloWorld
+
+printer_scanner:
+  module: printer_scanner
+  class: PrinterScanner
+  community: public
