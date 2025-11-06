@@ -35,6 +35,16 @@ sudo mysql -u root -p"${db_pass}" -e "CREATE DATABASE IF NOT EXISTS ${db_name} C
 sudo mysql -u root -p"${db_pass}" -e "CREATE USER IF NOT EXISTS '${db_user}'@'%' IDENTIFIED BY '${db_pass}';"
 sudo mysql -u root -p"${db_pass}" -e "GRANT ALL PRIVILEGES ON ${db_name}.* TO '${db_user}'@'%';"
 sudo mysql -u root -p"${db_pass}" -e "FLUSH PRIVILEGES;"
+sudo mysql -u root -p"${db_pass}" -e "CREATE TABLE IF NOT EXISTS ${db_name}.printer_status_logs (
+    log_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT,
+    printer_ip VARCHAR(255) NOT NULL,
+    cartridge_id VARCHAR(255) NOT NULL,
+    ink_level_percentage INT,
+    status_message TEXT,
+    execution_timestamp DATETIME NOT NULL,
+    email_sent BOOLEAN NOT NULL
+);"
 
 # Allow remote connections by binding to all interfaces
 sudo sed -i 's/bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/' /etc/my.cnf.d/mariadb-server.cnf

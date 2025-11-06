@@ -88,6 +88,8 @@ module "lambda" {
   db_name                  = var.db_name
   db_user                  = var.db_user
   db_pass                  = var.db_pass
+  mail_username            = var.mail_username
+  mail_password            = var.mail_password
 }
 
 # Root outputs to preserve original outputs

@@ -23,6 +23,12 @@ public class PrinterInkService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Value("${spring.mail.username}")
+    private String mailUsername;
+
+    @Value("${spring.mail.password}")
+    private String mailPassword;
+
     @Value("${spring.datasource.url}")
     private String databaseUrl;
 
@@ -98,21 +104,17 @@ public class PrinterInkService {
      * @param message The content of the email.
      */
     private void sendEmail(String message) throws Exception {
-        String fromEmail = "bryanpham2000@gmail.com";
-        String toEmail = "bryan_pham2000@yahoo.com";
-        try {
-            logger.info("Sending email from {}", fromEmail);
-            SimpleMailMessage mailMessage = new SimpleMailMessage();
-            mailMessage.setTo(toEmail);
-            mailMessage.setFrom(fromEmail);
-            mailMessage.setSubject("Printer Ink Level Alert");
-            mailMessage.setText(message);
-            javaMailSender.send(mailMessage);
-            logger.info("Email sent to {}", toEmail);
-        } catch (Exception e) {
-            logger.error("Error sending email to {}", toEmail, e);
-            throw e;
-        }
+        String fromEmail = mailUsername; // Use the configured mail username as the sender
+        String toEmail = "bryan_pham2000@yahoo.com"; // TODO: This should be made configurable
+
+        logger.info("Sending email from {}", fromEmail);
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(toEmail);
+        mailMessage.setFrom(fromEmail);
+        mailMessage.setSubject("Printer Ink Level Alert");
+        mailMessage.setText(message);
+        javaMailSender.send(mailMessage);
+        logger.info("Email sent to {}", toEmail);
     }
 
     /**

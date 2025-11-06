@@ -41,3 +41,13 @@ variable "db_user" {
 variable "db_pass" {
   type = string
 }
+
+variable "mail_username" {
+  type = string
+  description = "Username for the SMTP server"
+}
+
+variable "mail_password" {
+  type = string
+  description = "Password for the SMTP server"
+}

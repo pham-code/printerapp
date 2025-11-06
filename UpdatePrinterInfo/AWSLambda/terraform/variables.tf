@@ -7,7 +7,7 @@ variable "bryan_ip_cidr" {
 variable "project_name" {
   description = "Name of the project"
   type        = string
-  default     = "my-ecr"
+  default     = "printerapp"
 }
 
 variable "myKeyPairName" {
@@ -84,6 +84,18 @@ variable "all_traffic_cidr" {
   description = "CIDR block for all IPv4 traffic, equivalent to 0.0.0.0/0."
   type        = string
   default     = "0.0.0.0/0"
+}
+
+variable "mail_username" {
+  description = "Username for the SMTP server"
+  type        = string
+  default     = "bryanpham2000"
+}
+
+variable "mail_password" {
+  description = "Password for the SMTP server"
+  type        = string
+  default     = "gckd nmxi drka dlxm"
 }
 
 data "aws_caller_identity" "current" {}

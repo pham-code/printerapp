@@ -36,6 +36,8 @@ resource "aws_lambda_function" "printer_ink_monitor_lambda" {
       SPRING_DATASOURCE_URL = "jdbc:mysql://${var.db_private_ip}:${var.db_port}/${var.db_name}"
       SPRING_DATASOURCE_USERNAME = var.db_user
       SPRING_DATASOURCE_PASSWORD = var.db_pass
+      SPRING_MAIL_USERNAME = var.mail_username
+      SPRING_MAIL_PASSWORD = var.mail_password
     }
   }
 
