@@ -200,6 +200,15 @@ resource "aws_route_table" "lambda_private" {
   }
 }
 
+resource "aws_network_acl" "mynacl_lambda" {
+  vpc_id     = aws_vpc.myvpc.id
+  subnet_ids = [aws_subnet.lambda_private.id]
+  tags = {
+    Name        = "nacl-${var.project_name}-${var.environment}-lambda_private"
+    Environment = var.environment
+  }
+}
+
 resource "aws_route_table_association" "public" {
   count          = length(var.availability_zones)
   subnet_id      = aws_subnet.public[count.index].id
@@ -274,3 +283,35 @@ resource "aws_network_acl_rule" "outbound_db_all" {
   to_port        = 65535
 }
 
+resource "aws_network_acl_rule" "outbound_db_mysql_response" {
+  rule_number    = 901
+  network_acl_id = aws_network_acl.mynacl_db.id
+  egress         = true
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = aws_subnet.lambda_private.cidr_block
+  from_port      = 1024
+  to_port        = 65535
+}
+
+resource "aws_network_acl_rule" "outbound_lambda_all" {
+  rule_number    = 1000
+  network_acl_id = aws_network_acl.mynacl_lambda.id
+  egress         = true
+  protocol       = -1
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 0
+  to_port        = 65535
+}
+
+resource "aws_network_acl_rule" "inbound_lambda_mysql_response" {
+  rule_number    = 1001
+  network_acl_id = aws_network_acl.mynacl_lambda.id
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = aws_subnet.db.cidr_block
+  from_port      = 1024
+  to_port        = 65535
+}

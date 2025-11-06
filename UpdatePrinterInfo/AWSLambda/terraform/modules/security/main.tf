@@ -50,14 +50,6 @@ resource "aws_security_group" "db" {
     cidr_blocks = [var.all_traffic_cidr]
   }
 
-  egress { # Explicit rule for SMTP
-    description = "Allow outbound SMTP"
-    from_port   = 587
-    to_port     = 587
-    protocol    = "tcp"
-    cidr_blocks = [var.all_traffic_cidr]
-  }
-
   tags = {
     Name        = "db-${var.project_name}-${var.environment}"
     Environment = var.environment
@@ -77,14 +69,6 @@ resource "aws_security_group" "lambda" {
     cidr_blocks = [var.all_traffic_cidr]
   }
 
-  egress { # Explicit rule for SMTP
-    description = "Allow outbound SMTP"
-    from_port   = 587
-    to_port     = 587
-    protocol    = "tcp"
-    cidr_blocks = [var.all_traffic_cidr]
-  }
-
   egress { # Explicit rule for HTTPS
     description = "Allow outbound HTTPS"
     from_port   = 443
@@ -93,8 +77,16 @@ resource "aws_security_group" "lambda" {
     cidr_blocks = [var.all_traffic_cidr]
   }
 
+  egress {
+    description = "Allow outbound MySQL to DB security group"
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    security_groups = [aws_security_group.db.id]
+  }
+
   tags = {
-    Name        = "lambda-${var.project_name}-${var.environment}"
+    Name        = "lambda-${var.project_name}-${var.environment}-sg"
     Environment = var.environment
   }
 }

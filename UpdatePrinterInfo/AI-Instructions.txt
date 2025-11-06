@@ -23,6 +23,7 @@ As a senior microservice developer specialized in Java technologies, I want to c
     *   If any ink cartridge level is below 15%, trigger an AWS SNS notification.
     *   The SNS notification should send an email to the customer with the printer ink status.
 	*   The email address is customizable and should be setup to send to "test@test.com", for now.
+	*   When an exception occurs, return http status 504 with the message of the exception e.getMessage(). do not return 200 if there is any exception along the way
     *   Save the printer information (e.g., printer ID, cartridge details, ink levels) and the service execution timestamp to a MySQL database.
 *   **Technologies:** Java, Spring Boot.
 
@@ -121,3 +122,116 @@ Look for product price using Gemini agent:
 Instruction to wrapup the code when it's all done and tested:
 
 - As of now, the functionality is at a stable state. Do not make major changes to the code. Make sure all variables are named as it is intended and easy to understand. Remove any unused code or duplicate functions with other names. Regenerate documentation and add/remove any logging as they should be there for a purpose without performance impact. Update copilot-instructions to reflect current coding logic and also apply coding standards with best practice as much as possible. Review and regenerate any missing logic to comments, documentation, or readme files and make sure all generated description is up to date and aligned with the code.
+
+Debug internet connection from lambda:
+
+
+cd c:\Bryan\printerapp\UpdatePrinterInfo\AWSLambda\terraform; terraform output -json
+Auto approved by rules cd, terraform
+
+ Enable shell integration to improve command detection
+
+Thought for a few seconds
+
+aws lambda get-function-configuration --function-name PrinterInkMonitorLambda --region us-east-1 --output json
+Checked background terminal output
+
+
+aws lambda get-function-configuration --function-name PrinterInkMonitorLambda --region us-east-1 --query '{Subnets:VpcConfig.SubnetIds,SecurityGroups:VpcConfig.SecurityGroupIds}' --output json
+Checking network configuration
+
+aws ec2 describe-route-tables --filters "Name=association.subnet-id,Values=subnet-0cecdd6241f0ec785" --output json
+
+aws ec2 describe-nat-gateways --nat-gateway-ids nat-0247191a240af8ccd --output json
+
+aws ec2 describe-network-acls --filters Name=association.subnet-id,Values=subnet-0cecdd6241f0ec785 --output json
+
+aws ec2 describe-network-acls --filters Name=association.subnet-id,Values=subnet-038aba1840c0ed633 --output json
+
+aws ec2 describe-network-acls --filters Name=association.subnet-id,Values=subnet-038aba1840c0ed633 --query 'NetworkAcls[0].Entries' --output json
+
+aws ec2 describe-network-acls --filters Name=association.subnet-id,Values=subnet-038aba1840c0ed633 --query 'NetworkAcls[0].Entries' --output json
+
+aws ec2 describe-network-interfaces --filters "Name=subnet-id,Values=subnet-0cecdd6241f0ec785" --query 'NetworkInterfaces[*].{Id:NetworkInterfaceId,Desc:Description,Status:Status,PrivateIp:PrivateIpAddress,Attachment:Attachment}' --output json
+
+aws ec2 describe-network-acls --filters Name=association.subnet-id,Values=subnet-07a5d54fc3ba983f3 --output json
+
+aws ec2 describe-security-groups --group-ids sg-0fa74dc78ca617ac9 sg-07367a9ee4ea9f9ad --query 'SecurityGroups[*].{GroupId:GroupId,GroupName:GroupName,Inbound:IpPermissions,Outbound:IpPermissionsEgress}' --output json
+
+aws ec2 describe-security-groups --group-ids sg-0fa74dc78ca617ac9 sg-07367a9ee4ea9f9ad --output json
+
+
+no-VPC test:
+
+mkdir -Force temp_lambda; @'
+import urllib.request
+import json
+import os
+
+def lambda_handler(event, context):
+    url = os.environ.get('TEST_URL', 'https://httpbin.org/ip')
+    try:
+        with urllib.request.urlopen(url, timeout=10) as r:
+            body = r.read().decode('utf-8')
+        return {"statusCode": 200, "body": body}
+    except Exception as e:
+        return {"statusCode": 500, "error": str(e)}
+'@ | Out-File -FilePath temp_lambda\handler.py -Encoding utf8; Compress-Archive -Path temp_lambda\handler.py -DestinationPath temp_lambda\function.zip -Force; aws lambda create-function --function-name temp-no-vpc-test --zip-file fileb://temp_lambda/function.zip --handler handler.lambda_handler --runtime python3.9 --role arn:aws:iam::502882675682:role/iam-printerapp-dev-lambda-role --timeout 30 --memory-size 128; aws lambda invoke --function-name temp-no-vpc-test --payload '{}' temp_lambda\response.json; Get-Content temp_lambda\response.json; aws lambda delete-function --function-name temp-no-vpc-test; Remove-Item -Recurse -Force temp_lambda
+
+aws lambda invoke --function-name temp-no-vpc-test --payload '{}' temp_lambda\response.json --region us-east-1; Get-Content temp_lambda\response.json
+
+aws lambda wait function-active --function-name temp-no-vpc-test --region us-east-1; aws lambda invoke --function-name temp-no-vpc-test --payload '{}' temp_lambda\response.json --region us-east-1; cat temp_lambda\response.json; aws lambda delete-function --function-name temp-no-vpc-test --region us-east-1; Remove-Item -Recurse -Force temp_lambda
+
+
+
+mkdir -Force temp_lambda; @'
+import urllib.request
+import json
+import os
+
+def lambda_handler(event, context):
+    url = os.environ.get('TEST_URL', 'https://httpbin.org/ip')
+    try:
+        with urllib.request.urlopen(url, timeout=10) as r:
+            body = r.read().decode('utf-8')
+        return {"statusCode": 200, "body": body}
+    except Exception as e:
+        return {"statusCode": 500, "error": str(e)}
+'@ | Out-File -FilePath temp_lambda\handler.py -Encoding utf8; Compress-Archive -Path temp_lambda\handler.py -DestinationPath temp_lambda\function.zip -Force; ls -File temp_lambda\function.zip
+
+aws lambda create-function --function-name temp-no-vpc-test --zip-file fileb://temp_lambda/function.zip --handler handler.lambda_handler --runtime python3.9 --role arn:aws:iam::502882675682:role/iam-printerapp-dev-lambda-role --timeout 30 --memory-size 128 --region us-east-1
+
+aws lambda wait function-active --function-name temp-no-vpc-test --region us-east-1; echo Ready; aws lambda invoke --function-name temp-no-vpc-test --payload '{"test": true}' temp_lambda\response.json --region us-east-1; cat temp_lambda\response.json; aws lambda delete-function --function-name temp-no-vpc-test --region us-east-1; Remove-Item -Recurse -Force temp_lambda
+
+aws lambda invoke --function-name temp-no-vpc-test --payload '{}' temp_lambda\response.json --region us-east-1; Get-Content temp_lambda\response.json
+
+aws lambda list-functions --region us-east-1 --query "Functions[?starts_with(FunctionName,'temp-no-vpc')].FunctionName" --output json
+
+aws iam create-role --role-name temp-ssm-role --assume-role-policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+
+
+$policy = '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' ; aws iam create-role --role-name temp-ssm-role --assume-role-policy-document $policy
+
+Set-Content -Path temp_assume_policy.json -Value '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"ec2.amazonaws.com"},"Action":"sts:AssumeRole"}]}' -Encoding utf8; aws iam create-role --role-name temp-ssm-role --assume-role-policy-document file://temp_assume_policy.json --region us-east-1
+
+aws ssm describe-instance-information --region us-east-1 --output json
+
+
+$bastionId = (terraform output -raw worpress_public_instance_id); $bastionPrivateIp = (aws ec2 describe-instances --instance-ids $bastionId --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text); Write-Output "Bastion private IP: $bastionPrivateIp"
+
+$vpcId = (terraform output -raw vpc_id); $lambdaSubnet = (aws lambda get-function-configuration --function-name PrinterInkMonitorLambda --query 'VpcConfig.SubnetIds[0]' --output text); Write-Output "VPC: $vpcId, Lambda subnet: $lambdaSubnet"
+
+$sg = aws ec2 create-security-group --group-name temp-private-test-sg --description "temp sg for private test" --vpc-id $vpcId --query 'GroupId' --output text; Write-Output "Created SG: $sg"
+
+aws ec2 authorize-security-group-ingress --group-id $sg --protocol tcp --port 22 --cidr $bastionPrivateIp/32; aws ec2 authorize-security-group-egress --group-id $sg --protocol -1 --cidr 0.0.0.0/0; Write-Output "Ingress and egress rules applied"
+
+# Find AMI for Amazon Linux 2 (AL2023 used earlier). Use filter name al2023-ami-2023.*-x86_64
+$ami = aws ec2 describe-images --owners amazon --filters "Name=name,Values=al2023-ami-2023.*-x86_64" --query 'Images | sort_by(@,&CreationDate)[-1].ImageId' --output text; Write-Output "AMI: $ami"
+
+$inst = aws ec2 run-instances --image-id $ami --count 1 --instance-type t3.micro --key-name myecrkey --subnet-id $lambdaSubnet --security-group-ids $sg --associate-public-ip-address false --query 'Instances[0].InstanceId' --output text; Write-Output "Instance: $inst"; aws ec2 create-tags --resources $inst --tags Key=Name,Value=temp-private-test; aws ec2 wait instance-running --instance-ids $inst; $privip = aws ec2 describe-instances --instance-ids $inst --query 'Reservations[0].Instances[0].PrivateIpAddress' --output text; Write-Output "Private IP: $privip"
+
+aws ec2 describe-instances --filters "Name=tag:Name,Values=temp-private-test" --query 'Reservations[*].Instances[*].{Id:InstanceId,PrivateIp:PrivateIpAddress}' --output json
+
+
+
+

@@ -4,5 +4,5 @@ output "lambda_function_arn" {
 
 output "api_gateway_endpoint" {
   description = "The full invoke URL for the API Gateway endpoint"
-  value       = "${aws_api_gateway_deployment.deployment.invoke_url}${var.environment}${aws_api_gateway_resource.resource.path}"
+  value       = "${aws_api_gateway_stage.stage.invoke_url}${aws_api_gateway_resource.resource.path}"
 }
